@@ -1,48 +1,55 @@
 <script setup>
+import axios from "axios";
+
 const router = useRouter();
+const route = useRoute();
 
 // 串接 API 取得房型詳細資料
 // API path : https://nuxr3.zeabur.app/api/v1/rooms/{id}
 // 將資料渲染至下方的 div.room-page 區塊
+
+const room = ref({});
+const getRoomDetail = async () => {
+  try {
+    const response = await axios.get(
+      `https://nuxr3.zeabur.app/api/v1/rooms/${route.params.id}`
+    );
+    room.value = response.data.result;
+  } catch (error) {
+    console.error("取得房型詳細資料失敗", error);
+  }
+};
+getRoomDetail();
+
+const isProvide = (isProvide) => (isProvide ? "提供" : "不提供");
 </script>
 
 <template>
   <h2>房型詳細頁面</h2>
-
   <div class="container">
     <button @click="router.go(-1)">回上一頁</button>
     <div class="row justify-content-center">
       <div class="col-md-6">
         <div class="room-page">
           <div class="room-header">
-            <h1 class="room-name">尊爵雙人房</h1>
+            <h1 class="room-name">{{ room.name }}</h1>
             <p class="room-description">
-              享受高級的住宿體驗，尊爵雙人房提供給您舒適寬敞的空間和精緻的裝潢。
+              {{ room.description }}
             </p>
           </div>
 
           <div class="room-gallery">
             <img
-              src="https://raw.githubusercontent.com/hexschool/2022-web-layout-training/main/typescript-hotel/%E6%A1%8C%E6%A9%9F%E7%89%88/room2-1.png"
-              alt="尊爵雙人房主圖"
+              :src="room.imageUrl"
+              :alt="room.name"
               class="room-main-image"
             />
             <div class="room-image-list">
               <img
-                src="https://raw.githubusercontent.com/hexschool/2022-web-layout-training/main/typescript-hotel/%E6%A1%8C%E6%A9%9F%E7%89%88/room2-2.png"
-                alt="圖片2"
-              />
-              <img
-                src="https://raw.githubusercontent.com/hexschool/2022-web-layout-training/main/typescript-hotel/%E6%A1%8C%E6%A9%9F%E7%89%88/room2-3.png"
-                alt="圖片3"
-              />
-              <img
-                src="https://raw.githubusercontent.com/hexschool/2022-web-layout-training/main/typescript-hotel/%E6%A1%8C%E6%A9%9F%E7%89%88/room2-4.png"
-                alt="圖片4"
-              />
-              <img
-                src="https://github.com/hexschool/2022-web-layout-training/blob/main/typescript-hotel/%E6%A1%8C%E6%A9%9F%E7%89%88/room2-5.png?raw=true"
-                alt="圖片5"
+                v-for="imageUrl in room.imageUrlList"
+                :key="imageUrl"
+                :src="imageUrl"
+                alt="圖片"
               />
             </div>
           </div>
@@ -50,44 +57,36 @@ const router = useRouter();
           <div class="room-info">
             <div class="info-block">
               <h2>房間資訊</h2>
-              <p>面積: 24坪</p>
-              <p>床型: 一張大床</p>
-              <p>最多容納人數: 4</p>
-              <p>價格: NT$10,000</p>
+              <p>面積: {{ room.areaInfo }}</p>
+              <p>床型: {{ room.bedInfo }}</p>
+              <p>最多容納人數: {{ room.maxPeople }}</p>
+              <p>價格: NT${{ room.price }}</p>
             </div>
 
             <div class="info-block">
               <h2>房間配置</h2>
               <ul>
-                <li>市景: 提供</li>
-                <li>獨立衛浴: 提供</li>
-                <li>樓層電梯: 提供</li>
+                <li v-for="layout in room.layoutInfo" :key="layout.title">
+                  {{ layout.title }}: {{ isProvide(layout.isProvide) }}
+                </li>
               </ul>
             </div>
 
             <div class="info-block">
               <h2>房內設施</h2>
               <ul>
-                <li>平面電視: 提供</li>
-                <li>吹風機: 提供</li>
-                <li>冰箱: 提供</li>
-                <li>熱水壺: 提供</li>
-                <li>檯燈: 提供</li>
-                <li>衣櫥: 提供</li>
-                <li>書桌: 提供</li>
+                <li v-for="facility in room.facilityInfo" :key="facility">
+                  {{ facility.title }}: {{ isProvide(facility.isProvide) }}
+                </li>
               </ul>
             </div>
 
             <div class="info-block">
               <h2>客房備品</h2>
               <ul>
-                <li>衛生紙: 提供</li>
-                <li>拖鞋: 提供</li>
-                <li>沐浴用品: 提供</li>
-                <li>刮鬍刀: 提供</li>
-                <li>刷牙用品: 提供</li>
-                <li>罐裝水: 提供</li>
-                <li>梳子: 提供</li>
+                <li v-for="amenity in room.amenityInfo" :key="amenity">
+                  {{ amenity.title }}: {{ isProvide(amenity.isProvide) }}
+                </li>
               </ul>
             </div>
           </div>
