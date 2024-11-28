@@ -5,20 +5,13 @@ const roomsList = ref([]);
 
 const apiUrl = "https://nuxr3.zeabur.app/api/v1/rooms";
 
-fetch(apiUrl)
-  .then((response) => {
-    if (!response.ok) {
-      throw new Error("取得房型資料失敗");
-    }
-    return response.json();
-  })
-  .then((data) => {
-    const { result } = data;
-    roomsList.value = result;
-  })
-  .catch((error) => {
-    console.error("發生錯誤:", error);
-  });
+const { data: roomsData, error } = await useFetch(apiUrl);
+
+if (error.value) {
+  console.error("發生錯誤:", error.value);
+} else {
+  roomsList.value = roomsData.value.result;
+}
 </script>
 
 <template>

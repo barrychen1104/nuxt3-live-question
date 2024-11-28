@@ -1,25 +1,20 @@
 <script setup>
 import axios from "axios";
+import { useRoute } from "vue-router";
 
 const router = useRouter();
 const route = useRoute();
 
-// 串接 API 取得房型詳細資料
-// API path : https://nuxr3.zeabur.app/api/v1/rooms/{id}
-// 將資料渲染至下方的 div.room-page 區塊
-
-const room = ref({});
-const getRoomDetail = async () => {
+const { data: room } = await useAsyncData("roomDetail", async () => {
   try {
     const response = await axios.get(
       `https://nuxr3.zeabur.app/api/v1/rooms/${route.params.id}`
     );
-    room.value = response.data.result;
+    return response.data.result;
   } catch (error) {
-    console.error("取得房型詳細資料失敗", error);
+    console.error("發生錯誤:", error);
   }
-};
-getRoomDetail();
+});
 
 const isProvide = (isProvide) => (isProvide ? "提供" : "不提供");
 </script>
