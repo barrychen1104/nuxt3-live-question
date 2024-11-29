@@ -1,5 +1,7 @@
 <script setup>
 const { $swal } = useNuxtApp();
+const router = useRouter();
+
 const userLoginObject = ref({
   email: "",
   password: "",
@@ -28,6 +30,7 @@ const loginAccount = async (requsetBody) => {
       timer: 1500,
     });
 
+    router.push("/orders");
   } catch (error) {
     const { message } = error.response._data;
     $swal.fire({
